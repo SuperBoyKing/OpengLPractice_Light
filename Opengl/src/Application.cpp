@@ -67,10 +67,8 @@ int main()
 	{
 		glEnable(GL_DEPTH_TEST);
 
-		Shader lightingShader("res/shader/color.shader");
+		Shader lightingShader("res/shader/colors.shader");
 		Shader lightCubeShader("res/shader/light.shader");
-		lightingShader.use();
-		lightCubeShader.use();
 
 		float vertices[] = {
 			-0.5f, -0.5f, -0.5f,
@@ -154,11 +152,8 @@ int main()
 
 			glm::mat4 model = glm::mat4(1.0f);
 			lightingShader.setMat4("model", model);
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, lightPos);
-			model = glm::scale(model, glm::vec3(0.2f));
 
-			lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+			lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.3f);
 			lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 			GLCall(glBindVertexArray(cubeVAO));
@@ -171,6 +166,9 @@ int main()
 			model = glm::translate(model, lightPos);
 			model = glm::scale(model, glm::vec3(0.2f));
 			lightCubeShader.setMat4("model", model);
+
+			lightCubeShader.setVec3("objectColor", 1.0f, 0.5f, 0.3f);
+			lightCubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 			GLCall(glBindVertexArray(lightCubeVAO));
 			glDrawArrays(GL_TRIANGLES, 0, 36);

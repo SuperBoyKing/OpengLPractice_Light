@@ -440,8 +440,8 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="res\shader\color.shader" />
     <None Include="res\shader\light.shader" />
+    <None Include="res\shader\colors.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
