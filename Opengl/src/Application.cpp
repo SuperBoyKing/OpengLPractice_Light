@@ -13,13 +13,14 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "camera.h"
+#include "Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
 float lastX = 400.0f;
 float lastY = 300.0f;
 float firstMouse = true;
@@ -28,7 +29,7 @@ float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-glm::vec3 cubePos(2.0f, 2.0f, 3.0f);
+glm::vec3 cubePos(0.0f, 0.0f, 0.0f);
 
 int main()
 {
@@ -41,6 +42,8 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	/*glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
 
 	GLFWwindow* window;
 	window = glfwCreateWindow(800, 600, "01. Getting Start", NULL, NULL);
@@ -115,26 +118,27 @@ int main()
 			-0.5f,  0.5f, -0.5f,
 		};
 		
-		unsigned int VBO, cubeVAO;
-		GLCall(glGenVertexArrays(1, &cubeVAO));
+		unsigned int ColorcubeVAO;
+		GLCall(glGenVertexArrays(1, &ColorcubeVAO));
+		GLCall(glBindVertexArray(ColorcubeVAO));
+
+		unsigned int VBO;
 		GLCall(glGenBuffers(1, &VBO));
-
-		GLCall(glBindVertexArray(cubeVAO));
-
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
 		GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
 
 		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
 		GLCall(glEnableVertexAttribArray(0));
 
-		unsigned int lightCubeVAO;
+		/*unsigned int lightCubeVAO;
 		GLCall(glGenVertexArrays(1, &lightCubeVAO));
 		GLCall(glBindVertexArray(lightCubeVAO));
 
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
-		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-		GLCall(glEnableVertexAttribArray(0));
 
+		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+		GLCall(glEnableVertexAttribArray(0));*/
+		
 		while (!glfwWindowShouldClose(window))
 		{
 			float currentFrame = glfwGetTime();
@@ -146,41 +150,41 @@ int main()
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f);
-			glm::mat4 view = camera.GetViewMatrix();
-			glm::mat4 model = glm::mat4(1.0f);
-
 			lightingShader.use();
 			lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.3f);
 			lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+
+			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f);
+			glm::mat4 view = camera.GetViewMatrix();
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePos);
+			model = glm::scale(model, glm::vec3(0.5f));
 
 			lightingShader.setMat4("Projection", projection);
 			lightingShader.setMat4("view", view);
 			lightingShader.setMat4("model", model);
 
-			GLCall(glBindVertexArray(cubeVAO));
+			GLCall(glBindVertexArray(ColorcubeVAO));
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
-			//lightCubeShader.use();
+			/*lightCubeShader.use();
 			lightCubeShader.setMat4("projection", projection);
 			lightCubeShader.setMat4("view", view);
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, lightPos);
-			model = glm::scale(model, glm::vec3(0.4f));
+			model = glm::scale(model, glm::vec3(0.5f));
 			lightCubeShader.setMat4("model", model);
 
-			lightCubeShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-
 			GLCall(glBindVertexArray(lightCubeVAO));
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 
-		glDeleteVertexArrays(1, &lightCubeVAO);
-		glDeleteVertexArrays(1, &cubeVAO);
-		glDeleteBuffers(1, &VBO);
+		/*glDeleteVertexArrays(1, &lightCubeVAO);
+		glDeleteVertexArrays(1, &ColorcubeVAO);
+		glDeleteBuffers(1, &VBO);*/
 	}
 
 	glfwTerminate();
