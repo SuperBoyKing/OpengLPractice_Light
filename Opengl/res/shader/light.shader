@@ -1,5 +1,6 @@
 #shader vertex
 #version 330 core
+#extension GL_ARB_explicit_attrib_location : require
 
 layout(location = 0) in vec3 aPos;
 
@@ -17,10 +18,7 @@ void main()
 
 out vec4 FragColor;
 
-uniform vec3 objectColor;
-uniform vec3 lightColor;
-
 void main()
 {
-	FragColor = vec4(objectColor * lightColor, 1.0);
+	FragColor = vec4(1.0);
 }
