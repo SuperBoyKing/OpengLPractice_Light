@@ -149,6 +149,7 @@ int main()
 		float increment = 0.01;
 		while (!glfwWindowShouldClose(window))
 		{
+			float timeValue = glfwGetTime();
 			float currentFrame = glfwGetTime();
 			deltaTime = currentFrame - lastFrame;
 			lastFrame = currentFrame;
@@ -163,10 +164,19 @@ int main()
 			glm::mat4 model = glm::mat4(1.0f);
 
 			glm::vec3 lightPos(x, y, z);
+			glm::vec3 lightColor;
+			lightColor.x = sin(timeValue * 2.0f);
+			lightColor.y = sin(timeValue * 0.7f);
+			lightColor.z = sin(timeValue * 1.3f);
+
+			glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+			glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
 
 			lightingShader.use();
-			lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-			lightingShader.setVec3("lightPos", lightPos);
+			lightingShader.setVec3("light.ambient", ambientColor);
+			lightingShader.setVec3("light.diffuse", diffuseColor);
+			lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+			lightingShader.setVec3("light.position", lightPos);
 			lightingShader.setVec3("viewPos", camera.Position);
 
 			lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
@@ -181,7 +191,6 @@ int main()
 			GLCall(glBindVertexArray(boxCubeVAO));
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
-			float timeValue = glfwGetTime();
 			x = cos(timeValue) * 2;
 			z = sin(timeValue) * 2;
 
