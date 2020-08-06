@@ -20,7 +20,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
-Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = 400.0f;
 float lastY = 300.0f;
 float firstMouse = true;
@@ -28,7 +31,6 @@ float firstMouse = true;
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 cubePos(0.0f, 0.0f, 0.0f);
 
 int main()
@@ -39,14 +41,13 @@ int main()
 		return -1;
 	}
 
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-	/*glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
 
 	GLFWwindow* window;
-	window = glfwCreateWindow(800, 600, "01. Getting Start", NULL, NULL);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "01. Getting Start", NULL, NULL);
 	if (window == NULL)
 	{
 		fprintf(stderr, "Failed to open GLFW window. if you have an Intel GPU. they are not 3.3 compatible. Try the 2.1 version of the turorials.\n");
@@ -54,6 +55,7 @@ int main()
 		return -1;
 	}
 
+	glfwSwapInterval(1);
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -75,70 +77,76 @@ int main()
 		Shader lightCubeShader("res/shader/light.shader");
 
 		float vertices[] = {
-			-0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
+			// position			  // normal vector	
+			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-			-0.5f, -0.5f,  0.5f,
-			 0.5f, -0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
+			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,	1.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,	1.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,	1.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,	1.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,	1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,	1.0f,
 
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
+			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+			-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-			 0.5f,  0.5f,  0.5f,
-			 0.5f,  0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
+			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-			-0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f, -0.5f,
-			 0.5f, -0.5f,  0.5f,
-			 0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f, -0.5f, -0.5f,
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-			-0.5f,  0.5f, -0.5f,
-			 0.5f,  0.5f, -0.5f,
-			 0.5f,  0.5f,  0.5f,
-			 0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f,
+			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 		};
 		
-		unsigned int ColorcubeVAO;
-		GLCall(glGenVertexArrays(1, &ColorcubeVAO));
-		GLCall(glBindVertexArray(ColorcubeVAO));
+		unsigned int boxCubeVAO;
+		GLCall(glGenVertexArrays(1, &boxCubeVAO));
+		GLCall(glBindVertexArray(boxCubeVAO));
 
 		unsigned int VBO;
 		GLCall(glGenBuffers(1, &VBO));
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
 		GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW));
 
-		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
+		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0));
 		GLCall(glEnableVertexAttribArray(0));
 
-		/*unsigned int lightCubeVAO;
+		GLCall(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))));
+		GLCall(glEnableVertexAttribArray(1));
+
+		unsigned int lightCubeVAO;
 		GLCall(glGenVertexArrays(1, &lightCubeVAO));
 		GLCall(glBindVertexArray(lightCubeVAO));
 
 		GLCall(glBindBuffer(GL_ARRAY_BUFFER, VBO));
 
-		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-		GLCall(glEnableVertexAttribArray(0));*/
+		GLCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0));
+		GLCall(glEnableVertexAttribArray(0));
 		
+		float x = 1.0, y = 0.0, z = 1.0;
+		float increment = 0.01;
 		while (!glfwWindowShouldClose(window))
 		{
 			float currentFrame = glfwGetTime();
@@ -150,41 +158,52 @@ int main()
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			lightingShader.use();
-			lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.3f);
-			lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-
-			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f);
+			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 			glm::mat4 view = camera.GetViewMatrix();
 			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePos);
-			model = glm::scale(model, glm::vec3(0.5f));
 
-			lightingShader.setMat4("Projection", projection);
+			glm::vec3 lightPos(x, y, z);
+
+			lightingShader.use();
+			lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+			lightingShader.setVec3("lightPos", lightPos);
+			lightingShader.setVec3("viewPos", camera.Position);
+
+			lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+			lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+			lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+			lightingShader.setFloat("material.shininess", 32.0f);
+
+			lightingShader.setMat4("projection", projection);
 			lightingShader.setMat4("view", view);
 			lightingShader.setMat4("model", model);
 
-			GLCall(glBindVertexArray(ColorcubeVAO));
+			GLCall(glBindVertexArray(boxCubeVAO));
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 
-			/*lightCubeShader.use();
+			float timeValue = glfwGetTime();
+			x = cos(timeValue) * 2;
+			z = sin(timeValue) * 2;
+
+			lightCubeShader.use();
 			lightCubeShader.setMat4("projection", projection);
 			lightCubeShader.setMat4("view", view);
+
 			model = glm::mat4(1.0f);
 			model = glm::translate(model, lightPos);
-			model = glm::scale(model, glm::vec3(0.5f));
+			model = glm::scale(model, glm::vec3(0.2f));
 			lightCubeShader.setMat4("model", model);
 
 			GLCall(glBindVertexArray(lightCubeVAO));
-			glDrawArrays(GL_TRIANGLES, 0, 36);*/
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
 
-		/*glDeleteVertexArrays(1, &lightCubeVAO);
-		glDeleteVertexArrays(1, &ColorcubeVAO);
-		glDeleteBuffers(1, &VBO);*/
+		glDeleteVertexArrays(1, &lightCubeVAO);
+		glDeleteVertexArrays(1, &boxCubeVAO);
+		glDeleteBuffers(1, &VBO);
 	}
 
 	glfwTerminate();
