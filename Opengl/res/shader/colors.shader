@@ -19,7 +19,7 @@ void main()
 	Normal = mat3(transpose(inverse(model))) * aNormal;
 	TexCoords = aTexCoords;
 
-	gl_Position = projection * view * model * vec4(FragPos, 1.0);
+	gl_Position = projection * view * vec4(FragPos, 1.0);
 }
 
 #shader fragment
@@ -36,6 +36,10 @@ struct Light {
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
 };
 
 out vec4 FragColor;
@@ -64,6 +68,15 @@ void main()
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 	vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+
+	//attenuation
+	float distance = length(light.position - FragPos);
+	float attenuation = 1.0 / (light.constant + light.linear * distance + 
+		light.quadratic * (distance * distance));
+
+	ambient  *= attenuation;
+	diffuse  *= attenuation;
+	specular *= attenuation;
 
 	FragColor = vec4(ambient + diffuse + specular, 1.0);
 }
