@@ -186,18 +186,19 @@ int main()
 			glm::vec3 lightPos(x, y, z);
 
 			lightingShader.use();
-			lightingShader.setVec3("light.position", lightPos);
 			lightingShader.setVec3("viewPos", camera.Position);
 
-			lightingShader.setVec3("light.ambient", 0.5f, 0.5f, 0.5f);
-			lightingShader.setVec3("light.diffuse", 0.7f, 0.7f, 0.7f);
+			lightingShader.setVec3("light.position", camera.Position);
+			lightingShader.setVec3("light.direction", camera.Front);
+			lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+			lightingShader.setVec3("light.ambient", 0.1f, 0.1f, 0.1f);
+			lightingShader.setVec3("light.diffuse", 0.9f, 0.9f, 0.9f);
 			lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-			lightingShader.setFloat("material.shininess", 64.0f);
-
 			lightingShader.setFloat("light.constant", 1.0f);
 			lightingShader.setFloat("light.linear", 0.09f);
-			lightingShader.setFloat("light.quadratic", 0.032f);
+			lightingShader.setFloat("light.quadratic", 0.032f); 
+
+			lightingShader.setFloat("material.shininess", 64.0f);
 
 			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 			glm::mat4 view = camera.GetViewMatrix();
